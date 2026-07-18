@@ -99,7 +99,7 @@
       throwOnError: false,
       strict: 'ignore'
     });
-    fitDisplayMath();
+    requestAnimationFrame(fitDisplayMath);
   }
 
   // KaTeX deliberately keeps equations on one line. Scale only exceptionally
@@ -111,7 +111,7 @@
       if (!formula) return;
       let size = 1.42;
       formula.style.fontSize = `${size}em`;
-      while (formula.scrollWidth > display.clientWidth && size > 0.88) {
+      while (formula.getBoundingClientRect().width > display.clientWidth && size > 0.88) {
         size -= 0.06;
         formula.style.fontSize = `${size}em`;
       }
