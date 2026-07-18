@@ -67,9 +67,17 @@
       [/2c = 2ae/g, '$$2c=2ae$$'],
       [/F2 = \(-2ae, 0\)/g, '$$F_2=(-2ae,0)$$'],
       [/A = \u03c0ab x delt\/T/g, '$$A=\\frac{\\pi ab\\,\\Delta t}{T}$$'],
-      [/T\^2 = a\^3/g, '$$T^2=a^3$$']
+      [/T\^2 = a\^3/g, '$$T^2=a^3$$'],
+      [/\$\$v_obs = v_sys - v_rot \u00d7 sin\(i\) \u00d7 cos\(\u03b8\)\$\$/g,
+        '$$v_{\\mathrm{obs}}=v_{\\mathrm{sys}}-v_{\\mathrm{rot}}\\sin(i)\\cos(\\theta)$$'],
+      [/\$\$\u0394\u03bb = \u03bb0 \u00d7 \(v_obs \/ c\) \(c = 300,000 km\/s\)\$\$/g,
+        '$$\\Delta\\lambda=\\lambda_0\\left(\\frac{v_{\\mathrm{obs}}}{c}\\right),\\quad c=300{,}000\\,\\mathrm{km\\,s^{-1}}$$']
     ];
-    const normalized = fixes.reduce((html, [pattern, replacement]) => html.replace(pattern, replacement), original);
+    const normalized = fixes
+      .reduce((html, [pattern, replacement]) => html.replace(pattern, replacement), original)
+      .replace(/\$\$([^$]+)\$\$/g, (_, expression) =>
+        `$$${expression.replace(/([A-Za-z])_([A-Za-z]{2,})\b/g, '$1_{$2}')}$$`
+      );
     if (normalized !== original) root.innerHTML = normalized;
   }
 
