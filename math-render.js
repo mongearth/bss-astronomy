@@ -197,11 +197,11 @@
 
   function buildHeroOrbit() {
     const hero = document.querySelector('.hero');
-    if (!hero || hero.querySelector('.hero-photo-caption')) return;
-    const caption = document.createElement('p');
-    caption.className = 'hero-photo-caption';
-    caption.textContent = 'BUSAN SCIENCE HIGH SCHOOL · STAR TRAILS';
-    hero.append(caption);
+    if (!hero || hero.querySelector('.hero-photo-frame')) return;
+    const frame = document.createElement('figure');
+    frame.className = 'hero-photo-frame';
+    frame.innerHTML = '<img src="assets/bss-star-trails.jpg" alt="부산과학고등학교에서 촬영한 일주 운동 사진"><figcaption>BUSAN SCIENCE HIGH SCHOOL · STAR TRAILS</figcaption>';
+    hero.append(frame);
   }
 
   function buildResources() {
