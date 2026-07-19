@@ -155,7 +155,7 @@
     const grid = root?.querySelector('.modal-grid');
     const community = root?.querySelector('.community');
     const identity = root?.querySelector('.modal-top p')?.textContent || '';
-    const studentId = identity.match(/\d{4}/)?.[0];
+    const studentId = (identity.match(/\d{4}/g) || []).at(-1);
     const project = window.PROJECTS?.find(item => item.studentId === studentId);
     if (!grid || !project?.reflection || grid.querySelector('.student-reflection')) return;
     const section = document.createElement('section');
@@ -219,10 +219,10 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    if (!document.querySelector('link[href="popup-readability.css"]')) {
+    if (!document.querySelector('link[href^="popup-readability.css"]')) {
       const popupStyles = document.createElement('link');
       popupStyles.rel = 'stylesheet';
-      popupStyles.href = 'popup-readability.css';
+      popupStyles.href = 'popup-readability.css?v=20260720-3';
       document.head.append(popupStyles);
     }
     import('./anonymous-feedback.js?v=20260720-2');
