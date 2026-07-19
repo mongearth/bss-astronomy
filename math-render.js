@@ -225,7 +225,7 @@
       popupStyles.href = 'popup-readability.css';
       document.head.append(popupStyles);
     }
-    import('./anonymous-feedback.js');
+    import('./anonymous-feedback.js?v=20260720-2');
     buildLearningSection();
     buildTopGuide();
     buildHeroContext();

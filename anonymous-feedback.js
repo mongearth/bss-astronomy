@@ -33,8 +33,9 @@ function addNicknameField(form) {
 function prepareForms() {
   addNicknameField(document.querySelector('#projectForm'));
   addNicknameField(document.querySelector('#siteForm'));
+  const loginMessage = '좋아요와 방명록·질문은 로그인 없이 남길 수 있으며, 글은 교사 검토 후 공개됩니다.';
   document.querySelectorAll('.login-note').forEach(note => {
-    note.textContent = '좋아요와 방명록·질문은 로그인 없이 남길 수 있으며, 글은 교사 검토 후 공개됩니다.';
+    if (note.textContent !== loginMessage) note.textContent = loginMessage;
   });
 }
 
