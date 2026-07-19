@@ -200,6 +200,7 @@
     if (!hero || hero.querySelector('.hero-photo-frame')) return;
     const frame = document.createElement('figure');
     frame.className = 'hero-photo-frame';
+    frame.style.cssText = 'position:absolute;top:clamp(88px,9vw,125px);right:clamp(32px,4vw,82px);bottom:32px;width:min(39vw,565px);margin:0;z-index:0;display:flex;align-items:center;justify-content:center';
     frame.innerHTML = '<img src="assets/bss-star-trails.jpg" alt="부산과학고등학교에서 촬영한 일주 운동 사진"><figcaption>BUSAN SCIENCE HIGH SCHOOL · STAR TRAILS</figcaption>';
     hero.append(frame);
   }

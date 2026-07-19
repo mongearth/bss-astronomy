@@ -28,5 +28,17 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => window.setTimeout(renderFallback, 900));
+  function bindEssentialControls() {
+    const modal = document.querySelector('#modal');
+    const close = () => modal?.close();
+    document.querySelector('#closeBtn')?.addEventListener('click', close);
+    modal?.addEventListener('click', event => { if (event.target === modal) close(); });
+    document.querySelector('#randomBtn')?.addEventListener('click', () => {
+      if (window.__archiveAppReady) return;
+      const data = Array.isArray(window.PROJECTS) ? window.PROJECTS : [];
+      if (data.length) openFallbackProject(data[Math.floor(Math.random() * data.length)]);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { bindEssentialControls(); window.setTimeout(renderFallback, 900); });
 })();
