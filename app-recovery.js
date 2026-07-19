@@ -41,7 +41,7 @@ function buildFilters() {
 }
 
 function feedbackMarkup() {
-  return `<section class="community"><div class="community-head"><div><h3>작품 피드백</h3><p>좋아요와 응원, 질문, 개선 의견은 작품을 더 깊게 탐구하는 출발점이 됩니다.</p></div><button id="likeBtn" class="like" type="button">♡ 좋아요 0</button></div><p class="login-note">표시 이름은 선택 사항입니다. 글은 교사 검토 후 공개됩니다.</p><form id="projectFeedbackForm"><select name="type"><option value="guestbook">응원 · 댓글 · 피드백</option><option value="question">질문</option></select><input name="authorName" maxlength="20" placeholder="표시 이름 (선택)"><textarea name="content" maxlength="1000" placeholder="작품에 관한 응원, 질문 또는 피드백을 남겨 주세요." required></textarea><button type="submit">검토 요청 보내기</button></form><div id="feedbackList"><p class="empty-feedback">피드백을 불러오는 중입니다.</p></div></section>`;
+  return `<section class="community"><div class="community-head"><div><h3>작품 피드백</h3><p>좋아요와 응원, 질문, 개선 의견은 작품을 더 깊게 탐구하는 출발점이 됩니다.</p></div><button id="likeBtn" class="like" type="button">♡ 좋아요 0</button></div><p class="login-note">표시 이름은 선택 사항입니다. 글은 교사 검토 후 공개됩니다.</p><form id="projectFeedbackForm"><select name="type"><option value="guestbook">응원 · 댓글</option><option value="guestbook">개선 피드백</option><option value="question">질문</option></select><input name="authorName" maxlength="20" placeholder="표시 이름 (선택)"><textarea name="content" maxlength="1000" placeholder="작품에 관한 응원, 질문 또는 피드백을 남겨 주세요." required></textarea><button type="submit">검토 요청 보내기</button></form><div id="feedbackList"><p class="empty-feedback">피드백을 불러오는 중입니다.</p></div></section>`;
 }
 
 function openProject(id) {

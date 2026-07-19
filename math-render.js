@@ -287,7 +287,7 @@
     if (!document.querySelector('link[href^="popup-readability.css"]')) {
       const popupStyles = document.createElement('link');
       popupStyles.rel = 'stylesheet';
-      popupStyles.href = 'popup-readability.css?v=20260720-5';
+      popupStyles.href = 'popup-readability.css?v=20260720-6';
       document.head.append(popupStyles);
     }
     if (!document.querySelector('link[href^="experience.css"]')) {
