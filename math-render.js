@@ -122,4 +122,74 @@
     clearTimeout(timer);
     timer = setTimeout(render, 0);
   }).observe(root, { childList: true, subtree: true });
+
+  const controlTerms = [
+    ['질량', '질량'], ['반지름', '반지름'], ['온도', '온도'], ['거리', '거리'],
+    ['이심률', '이심률'], ['각도', '각도'], ['속도', '속도'], ['시간', '시간'],
+    ['밝기', '밝기'], ['광도', '광도'], ['파장', '파장'], ['밀도', '밀도']
+  ];
+
+  function controlBadges(project) {
+    const text = `${project.how || ''} ${project.purpose || ''}`;
+    const labels = controlTerms.filter(([term]) => text.includes(term)).map(([, label]) => label);
+    return [...new Set(labels)].slice(0, 3);
+  }
+
+  function decorateProjectCards() {
+    const holder = document.querySelector('#cards');
+    if (!holder || !window.PROJECTS) return;
+    holder.querySelectorAll('.card').forEach(card => {
+      if (card.querySelector('.control-badges')) return;
+      const project = window.PROJECTS.find(item => item.id === card.dataset.id);
+      if (!project) return;
+      const labels = controlBadges(project);
+      const badge = document.createElement('div');
+      badge.className = 'control-badges';
+      badge.innerHTML = `<span>조작</span>${(labels.length ? labels : ['변인 탐색']).map(label => `<b>${label}</b>`).join('')}`;
+      card.querySelector('.tag')?.after(badge);
+    });
+  }
+
+  function buildLearningSection() {
+    const about = document.querySelector('.about');
+    if (!about || about.dataset.enhanced) return;
+    about.dataset.enhanced = 'true';
+    about.innerHTML = `
+      <div class="learning-intro">
+        <p class="eyebrow">LEARNING THROUGH MAKING</p>
+        <h2>코드는 관측의<br>또 다른 도구입니다.</h2>
+        <p class="learning-lead">학생들은 우주 현상을 선택하고, 변인을 직접 조작할 수 있는 시뮬레이션을 설계했습니다. 이 아카이브는 완성된 화면만이 아니라 질문에서 출발한 탐구의 기록입니다.</p>
+        <blockquote>“값을 바꾸고, 변화를 관찰하고, 모델의 한계를 설명한다.”</blockquote>
+      </div>
+      <div class="learning-content">
+        <section class="learning-panel">
+          <p class="eyebrow">HOW TO EXPLORE</p>
+          <h3>이 아카이브를 보는 방법</h3>
+          <ol class="learning-path">
+            <li><b>01</b><span><strong>조작 변인</strong>을 찾아 값을 바꿔 보세요.</span></li>
+            <li><b>02</b><span>그래프·궤도·밝기 등 <strong>결과의 변화</strong>를 관찰하세요.</span></li>
+            <li><b>03</b><span><strong>과학 원리와 수식</strong>이 결과를 어떻게 설명하는지 읽어 보세요.</span></li>
+            <li><b>04</b><span>마지막으로 <strong>모델의 한계</strong>와 실제 우주의 차이를 생각해 보세요.</span></li>
+          </ol>
+        </section>
+        <section class="learning-panel teacher-note">
+          <p class="eyebrow">TEACHER'S NOTE</p>
+          <h3>수업 설계의 핵심</h3>
+          <p>이 수업은 ‘조작 → 변화 관찰’이 일어나는 천문학 실험실을 만드는 활동입니다. 학생들은 과학적 원리와 물리량을 코드로 연결하고, 극단값 점검과 한계 분석을 통해 자신의 모델을 검증했습니다.</p>
+          <div class="assessment-grid"><span><b>30</b>지구과학 이론</span><span><b>30</b>시뮬레이션 구현</span><span><b>20</b>수행 과정</span><span><b>20</b>산출물 소개</span></div>
+        </section>
+        <section class="reflection-note">
+          <p class="eyebrow">STUDENT VOICES</p>
+          <h3>학생의 한마디</h3>
+          <p>학생 소감은 공개 동의와 개인정보 검토를 거쳐 순차적으로 소개됩니다.</p>
+        </section>
+      </div>`;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    buildLearningSection();
+    const cards = document.querySelector('#cards');
+    if (cards) new MutationObserver(decorateProjectCards).observe(cards, { childList: true });
+    decorateProjectCards();
+  });
 })();
