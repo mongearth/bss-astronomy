@@ -234,8 +234,8 @@ function subscribeProjectMetrics() {
   });
   Promise.all(projects.map(async project => {
     try {
-      const count = await firebase.getCountFromServer(firebase.collection(firebase.db, 'projects', project.id, 'likes'));
-      projectLikes.set(project.id, count.data().count);
+      const likesSnapshot = await firebase.getDocs(firebase.collection(firebase.db, 'projects', project.id, 'likes'));
+      projectLikes.set(project.id, likesSnapshot.size);
     } catch (error) { projectLikes.set(project.id, 0); }
   })).then(renderCards);
 }
