@@ -55,6 +55,24 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isTeacher();
     }
+    match /siteStats/overview {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['totalViews', 'dailyViews', 'dateKey', 'updatedAt'])
+        && request.resource.data.totalViews == 1
+        && request.resource.data.dailyViews == 1
+        && request.resource.data.dateKey is string
+        && request.resource.data.updatedAt == request.time;
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalViews', 'dailyViews', 'dateKey', 'updatedAt'])
+        && request.resource.data.totalViews == resource.data.totalViews + 1
+        && request.resource.data.updatedAt == request.time
+        && ((request.resource.data.dateKey == resource.data.dateKey
+          && request.resource.data.dailyViews == resource.data.dailyViews + 1)
+          || (request.resource.data.dateKey != resource.data.dateKey
+            && request.resource.data.dailyViews == 1));
+      allow delete: if isTeacher();
+    }
     match /{document=**} { allow read, write: if false; }
   }
 }
