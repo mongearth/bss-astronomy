@@ -11,3 +11,6 @@ body:lang(ko) .intro,body:lang(ko) .hero-context,body:lang(ko) .about p,body:lan
 
 /* Public feedback controls: readable desktop layout, stacked safely on small screens. */
 .community form input{background:#111631;border:1px solid #58628f;color:#f4f6ff;padding:10px 12px;font:14px 'Noto Sans KR',sans-serif;min-width:0}.community form input::placeholder{color:#aeb8da}.community form{grid-template-columns:170px 180px minmax(240px,1fr) auto}.community .login-note{font-size:15px;line-height:1.7}.community .empty-feedback{font-size:15px}.community .feedback p{font-size:16px;line-height:1.75}@media(max-width:850px){.community form{grid-template-columns:1fr}.community form input{min-height:44px}}
+
+/* Visit statistics keep the public impact visible without exposing visitor identity. */
+.metrics{flex-wrap:wrap}.metrics span:nth-child(3) b,.metrics span:nth-child(4) b{color:#f5c260}.metrics span:nth-child(3),.metrics span:nth-child(4){white-space:nowrap}@media(max-width:760px){.metrics{row-gap:14px}.metrics span:nth-child(3),.metrics span:nth-child(4){font-size:11px}}

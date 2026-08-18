@@ -8,6 +8,48 @@ let firebase = null;
 let unsubscribeLikes = null;
 let unsubscribeFeedback = null;
 
+function seoulDateKey() {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+  const value = type => parts.find(part => part.type === type)?.value;
+  return `${value('year')}-${value('month')}-${value('day')}`;
+}
+
+function showVisitStats(data = {}) {
+  const today = $('#visitDaily');
+  const total = $('#visitTotal');
+  if (today) today.textContent = Number(data.dailyViews || 0).toLocaleString('ko-KR');
+  if (total) total.textContent = Number(data.totalViews || 0).toLocaleString('ko-KR');
+}
+
+async function trackVisit() {
+  if (!firebase?.user) return;
+  const key = seoulDateKey();
+  const storageKey = `bss-astronomy-visit-${key}`;
+  const reference = firebase.doc(firebase.db, 'siteStats', 'overview');
+  try {
+    if (!localStorage.getItem(storageKey)) {
+      const result = await firebase.runTransaction(firebase.db, async transaction => {
+        const snapshot = await transaction.get(reference);
+        const previous = snapshot.exists() ? snapshot.data() : {};
+        const sameDay = previous.dateKey === key;
+        const next = {
+          totalViews: Number(previous.totalViews || 0) + 1,
+          dailyViews: sameDay ? Number(previous.dailyViews || 0) + 1 : 1,
+          dateKey: key,
+          updatedAt: firebase.serverTimestamp()
+        };
+        transaction.set(reference, next);
+        return next;
+      });
+      localStorage.setItem(storageKey, '1');
+      showVisitStats(result);
+    } else {
+      const snapshot = await firebase.getDoc(reference);
+      if (snapshot.exists()) showVisitStats(snapshot.data());
+    }
+  } catch (error) { /* Statistics must never prevent the archive from opening. */ }
+}
+
 function visibleProjects() {
   const sort = $('#sort')?.value || 'num';
   return projects.filter(project => (selectedTopic === '전체' || project.topic === selectedTopic) && `${project.title} ${project.studentId} ${project.topic} ${project.purpose || ''} ${project.how || ''}`.toLowerCase().includes(searchText.toLowerCase())).sort((a, b) => sort === 'title' ? a.title.localeCompare(b.title, 'ko') : sort === 'topic' ? a.topic.localeCompare(b.topic, 'ko') : a.id.localeCompare(b.id));
@@ -117,6 +159,7 @@ async function connectFirebase() {
     authModule.onAuthStateChanged(firebase.auth, user => {
       if (!user) { authModule.signInAnonymously(firebase.auth).catch(() => {}); return; }
       firebase.user = user;
+      trackVisit();
       if (activeProject && $('#modal')?.open) subscribeCommunity();
     });
   } catch (error) {
@@ -134,6 +177,9 @@ function boot() {
   $('#randomBtn')?.addEventListener('click', () => { const pool = visibleProjects(); if (pool.length) openProject(pool[Math.floor(Math.random() * pool.length)].id); });
   $('#closeBtn')?.addEventListener('click', closeModal);
   $('#modal')?.addEventListener('click', event => { if (event.target === $('#modal')) closeModal(); });
+  window.addEventListener('keydown', event => {
+    if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'm') window.location.assign('admin.html');
+  });
   connectFirebase();
 }
 
