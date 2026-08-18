@@ -24,6 +24,34 @@ service cloud.firestore {
       allow delete: if isTeacher() || (signedIn() && userId == request.auth.uid);
       allow update: if false;
     }
+    match /projectStats/{projectId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['views', 'updatedAt'])
+        && request.resource.data.views == 1
+        && request.resource.data.updatedAt == request.time
+        && existsAfter(/databases/$(database)/documents/projectStats/$(projectId)/visitors/$(request.auth.uid))
+        && getAfter(/databases/$(database)/documents/projectStats/$(projectId)/visitors/$(request.auth.uid)).data.lastRecorded == request.time;
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views', 'updatedAt'])
+        && request.resource.data.views == resource.data.views + 1
+        && request.resource.data.updatedAt == request.time
+        && existsAfter(/databases/$(database)/documents/projectStats/$(projectId)/visitors/$(request.auth.uid))
+        && getAfter(/databases/$(database)/documents/projectStats/$(projectId)/visitors/$(request.auth.uid)).data.lastRecorded == request.time;
+      allow delete: if isTeacher();
+
+      match /visitors/{userId} {
+        allow read: if signedIn() && userId == request.auth.uid;
+        allow create: if signedIn() && userId == request.auth.uid
+          && request.resource.data.keys().hasOnly(['lastRecorded'])
+          && request.resource.data.lastRecorded == request.time;
+        allow update: if signedIn() && userId == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastRecorded'])
+          && request.resource.data.lastRecorded == request.time
+          && request.time - resource.data.lastRecorded >= duration.value(10, 'm');
+        allow delete: if isTeacher();
+      }
+    }
     match /feedback/{feedbackId} {
       allow read: if isTeacher() || resource.data.status == 'published';
       allow create: if signedIn()
@@ -62,15 +90,30 @@ service cloud.firestore {
         && request.resource.data.totalViews == 1
         && request.resource.data.dailyViews == 1
         && request.resource.data.dateKey is string
-        && request.resource.data.updatedAt == request.time;
+        && request.resource.data.updatedAt == request.time
+        && existsAfter(/databases/$(database)/documents/siteVisitors/$(request.auth.uid))
+        && getAfter(/databases/$(database)/documents/siteVisitors/$(request.auth.uid)).data.lastRecorded == request.time;
       allow update: if signedIn()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['totalViews', 'dailyViews', 'dateKey', 'updatedAt'])
         && request.resource.data.totalViews == resource.data.totalViews + 1
         && request.resource.data.updatedAt == request.time
+        && existsAfter(/databases/$(database)/documents/siteVisitors/$(request.auth.uid))
+        && getAfter(/databases/$(database)/documents/siteVisitors/$(request.auth.uid)).data.lastRecorded == request.time
         && ((request.resource.data.dateKey == resource.data.dateKey
           && request.resource.data.dailyViews == resource.data.dailyViews + 1)
           || (request.resource.data.dateKey != resource.data.dateKey
             && request.resource.data.dailyViews == 1));
+      allow delete: if isTeacher();
+    }
+    match /siteVisitors/{userId} {
+      allow read: if signedIn() && userId == request.auth.uid;
+      allow create: if signedIn() && userId == request.auth.uid
+        && request.resource.data.keys().hasOnly(['lastRecorded'])
+        && request.resource.data.lastRecorded == request.time;
+      allow update: if signedIn() && userId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastRecorded'])
+        && request.resource.data.lastRecorded == request.time
+        && request.time - resource.data.lastRecorded >= duration.value(15, 'm');
       allow delete: if isTeacher();
     }
     match /{document=**} { allow read, write: if false; }

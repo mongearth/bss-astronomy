@@ -296,7 +296,6 @@
       experienceStyles.href = 'experience.css?v=20260720-3';
       document.head.append(experienceStyles);
     }
-    import('./anonymous-feedback.js?v=20260720-2');
     import('./space-atmosphere.js?v=20260720-1');
     buildLearningSection();
     buildTopGuide();
