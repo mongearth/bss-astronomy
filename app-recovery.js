@@ -118,6 +118,38 @@ function loadInsightsStyles() {
   link.dataset.insightsStyle = 'true';
   link.href = 'insights.css?v=20260819-1';
   document.head.append(link);
+  const participation = document.createElement('link');
+  participation.rel = 'stylesheet';
+  participation.dataset.participationStyle = 'true';
+  participation.href = 'participation.css?v=20260819-1';
+  document.head.append(participation);
+}
+
+function ensureParticipation() {
+  if ($('#siteParticipation')) return;
+  const intro = $('.hero .intro');
+  if (!intro) return;
+  const section = document.createElement('section');
+  section.id = 'siteParticipation';
+  section.className = 'site-participation';
+  section.setAttribute('aria-labelledby', 'participationTitle');
+  section.innerHTML = `<p class="eyebrow">SHARE YOUR THOUGHTS</p><h2 id="participationTitle">둘러본 생각을 남겨 주세요</h2><p>학생 작품을 살펴본 느낌, 궁금한 점, 더 좋아질 아이디어를 편하게 전해 주세요. 표시 이름은 선택 사항이며 교사 검토 후 공개됩니다.</p><form id="siteFormInline"><select name="type" aria-label="의견 종류"><option value="impression">응원 · 댓글</option><option value="suggestion">개선 피드백</option><option value="question">질문</option></select><input name="authorName" maxlength="20" placeholder="표시 이름 (선택)" aria-label="표시 이름"><textarea name="content" maxlength="1000" placeholder="이 사이트를 둘러본 생각을 남겨 주세요." required aria-label="의견 내용"></textarea><button type="submit">의견 보내기</button></form><p class="participation-note">좋은 점과 궁금한 점 모두 환영합니다.</p>`;
+  intro.after(section);
+  $('#siteFormInline').addEventListener('submit', submitSiteFeedback);
+}
+
+function openGuide() {
+  let dialog = $('#guideDialog');
+  if (!dialog) {
+    dialog = document.createElement('dialog');
+    dialog.id = 'guideDialog';
+    dialog.innerHTML = `<button class="close" type="button" aria-label="아카이브 안내 닫기">×</button><section class="guide-content"><p class="eyebrow">HOW TO EXPLORE</p><h2>이 아카이브를 보는 방법</h2><ol><li><b>조작 변인</b>을 확인하고 시뮬레이션에서 값을 바꿔 보세요.</li><li>그래프·궤도·밝기 등 <b>결과의 변화</b>를 관찰하세요.</li><li>작품 상세의 <b>과학적 원리와 수식</b>을 읽어 보세요.</li><li>모델의 한계와 실제 우주의 차이를 생각해 보세요.</li></ol><button class="guide-done" type="button">탐험 시작하기</button></section>`;
+    document.body.append(dialog);
+    dialog.querySelector('.close').addEventListener('click', () => dialog.close());
+    dialog.querySelector('.guide-done').addEventListener('click', () => { dialog.close(); $('#gallery')?.scrollIntoView({ behavior: 'smooth' }); });
+    dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+  }
+  dialog.showModal();
 }
 
 function insightCard(project, value, label) {
@@ -343,6 +375,7 @@ async function connectFirebase() {
 function boot() {
   window.__archiveAppReady = true;
   loadInsightsStyles();
+  ensureParticipation();
   buildFilters();
   ensureInsights();
   renderCards();
@@ -356,7 +389,8 @@ function boot() {
   $('#guestbookCloseBtn')?.addEventListener('click', () => { unsubscribeSiteFeedback?.(); $('#guestbookDialog')?.close(); });
   $('#modal')?.addEventListener('click', event => { if (event.target === $('#modal')) closeModal(); });
   $('#guestbookDialog')?.addEventListener('click', event => { if (event.target === $('#guestbookDialog')) { unsubscribeSiteFeedback?.(); $('#guestbookDialog').close(); } });
-  $('#siteGuestbookBtn')?.addEventListener('click', openGuestbook);
+  $('#siteGuestbookBtn')?.addEventListener('click', () => $('#siteParticipation')?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+  $('#guideBtn')?.addEventListener('click', openGuide);
   window.addEventListener('keydown', event => {
     if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 'm') window.location.assign('admin.html');
   });

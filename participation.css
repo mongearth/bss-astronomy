@@ -1,0 +1,17 @@
+.site-participation { width: min(620px, 100%); margin: 28px 0 26px; padding: 18px 20px; border-left: 2px solid #f5c260; background: rgba(20, 29, 67, .82); }
+.site-participation h2 { margin: 0 0 8px; color: #f7f4ed; font-size: 22px; letter-spacing: -.03em; }
+.site-participation > p:not(.eyebrow):not(.participation-note) { margin: 0 0 14px; color: #cbd2ee; font-size: 14px; line-height: 1.7; }
+.site-participation form { display: grid; grid-template-columns: 130px 160px 1fr auto; gap: 7px; }
+.site-participation select, .site-participation input, .site-participation textarea { min-width: 0; border: 1px solid #46578f; background: #111733; color: #f1f3ff; padding: 10px; font: 13px 'Noto Sans KR', sans-serif; }
+.site-participation textarea { min-height: 42px; resize: vertical; }
+.site-participation button { border: 1px solid #f5c260; background: #f5c260; color: #172039; padding: 10px 14px; font-weight: 700; white-space: nowrap; }
+.participation-note { margin: 10px 0 0; color: #95a4d0; font-size: 12px; }
+#guideDialog { width: min(680px, 92vw); padding: 0; }
+.guide-content { padding: 42px 48px 38px; }
+.guide-content h2 { margin: 0 0 22px; font-size: 32px; }
+.guide-content ol { margin: 0; padding: 0; list-style: none; border-top: 1px solid #3e4566; }
+.guide-content li { padding: 15px 0; border-bottom: 1px solid #3e4566; color: #d7def5; line-height: 1.7; }
+.guide-content li::before { content: counter(list-item, decimal-leading-zero); display: inline-block; width: 40px; color: #f5c260; font: 11px 'DM Mono'; }
+.guide-content li b { color: #fff; }
+.guide-done { margin-top: 22px; padding: 12px 16px; border: 1px solid #f5c260; background: #f5c260; color: #172039; font-weight: 700; }
+@media (max-width: 760px) { .site-participation { margin-right: 25px; } .site-participation form { grid-template-columns: 1fr; } .guide-content { padding: 35px 25px 28px; } .guide-content h2 { font-size: 27px; } }
