@@ -16,6 +16,15 @@ const projectLikes = new Map();
 const projectComments = new Map();
 const SITE_VISIT_INTERVAL_MS = 15 * 60 * 1000;
 const PROJECT_VIEW_INTERVAL_MS = 10 * 60 * 1000;
+const FEEDBACK_COOLDOWN_MS = 30 * 1000;
+
+function feedbackCooldown(scope) {
+  const key = `bss-astronomy-feedback-${scope}-at`;
+  const remaining = FEEDBACK_COOLDOWN_MS - (Date.now() - Number(localStorage.getItem(key) || 0));
+  if (remaining > 0) return Math.ceil(remaining / 1000);
+  localStorage.setItem(key, String(Date.now()));
+  return 0;
+}
 
 function seoulDateKey() {
   const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
@@ -125,6 +134,8 @@ async function submitSiteFeedback(event) {
   const content = String(values.get('content') || '').trim();
   if (!content) return;
   if (!firebase?.user) { alert('방명록 서비스를 연결하는 중입니다. 잠시 후 다시 시도해 주세요.'); return; }
+  const remaining = feedbackCooldown('site');
+  if (remaining) { alert(`잠시만 기다려 주세요. ${remaining}초 후 다시 등록할 수 있습니다.`); return; }
   try {
     await firebase.addDoc(firebase.collection(firebase.db, 'siteFeedback'), { type: values.get('type'), content, authorName: String(values.get('authorName') || '').trim() || '익명 방문자', authorUid: firebase.user.uid, status: 'pending', createdAt: firebase.serverTimestamp() });
     event.currentTarget.reset();
@@ -189,6 +200,8 @@ async function submitFeedback(event) {
   const content = String(fields.get('content') || '').trim();
   if (!content) return;
   if (!firebase?.user) { alert('피드백 서비스를 연결하는 중입니다. 잠시 후 다시 시도해 주세요.'); return; }
+  const remaining = feedbackCooldown(`project-${activeProject.id}`);
+  if (remaining) { alert(`잠시만 기다려 주세요. ${remaining}초 후 다시 등록할 수 있습니다.`); return; }
   try {
     await firebase.addDoc(firebase.collection(firebase.db, 'feedback'), { projectId: activeProject.id, type: fields.get('type'), content, authorName: String(fields.get('authorName') || '').trim() || '익명 방문자', authorUid: firebase.user.uid, status: 'pending', createdAt: firebase.serverTimestamp() });
     form.reset();
