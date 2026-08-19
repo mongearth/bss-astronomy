@@ -1,10 +1,10 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js';
-import { getFirestore, collection, collectionGroup, onSnapshot, updateDoc, doc } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js';
+import { getFirestore, collection, onSnapshot, updateDoc, doc } from 'https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js';
 
 const config = { apiKey: 'AIzaSyApXaG_rT0-veZzozy3Wtns2IGHZqDOYXc', authDomain: 'bss-astronomy-2026.firebaseapp.com', projectId: 'bss-astronomy-2026', storageBucket: 'bss-astronomy-2026.firebasestorage.app', messagingSenderId: '1054853511225', appId: '1:1054853511225:web:c95e38bac3512d815b75e8' };
 const app = initializeApp(config), auth = getAuth(app), db = getFirestore(app), teacherEmail = 'sjm4104@gmail.com', projects = window.PROJECTS || [];
-let user = null, feedbackItems = [], siteItems = [], likeTotal = 0, stops = [];
+let user = null, feedbackItems = [], siteItems = [], likeTotal = 0, stops = [], likeCounts = new Map();
 const $ = selector => document.querySelector(selector);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const projectLabel = id => { const project = projects.find(item => item.id === id); return project ? `${project.studentId} · ${project.title}` : '전체 방명록'; };
@@ -22,10 +22,11 @@ function refresh() {
 function showError() { $('#adminList').innerHTML = '<p class="empty-feedback">데이터를 불러오지 못했습니다. 로그인 상태와 Firestore 규칙을 확인해 주세요.</p>'; }
 function listen() {
   stops.forEach(stop => stop());
+  likeCounts = new Map();
   stops = [
     onSnapshot(collection(db, 'feedback'), snapshot => { feedbackItems = snapshot.docs.map(item => ({ ...item.data(), id: item.id, collection: 'feedback' })); refresh(); }, showError),
     onSnapshot(collection(db, 'siteFeedback'), snapshot => { siteItems = snapshot.docs.map(item => ({ ...item.data(), id: item.id, collection: 'siteFeedback' })); refresh(); }, showError),
-    onSnapshot(collectionGroup(db, 'likes'), snapshot => { likeTotal = snapshot.size; refresh(); }, showError)
+    ...projects.map(project => onSnapshot(collection(db, 'projects', project.id, 'likes'), snapshot => { likeCounts.set(project.id, snapshot.size); likeTotal = [...likeCounts.values()].reduce((sum, count) => sum + count, 0); refresh(); }, () => { likeCounts.set(project.id, 0); }))
   ];
 }
 function render() {
