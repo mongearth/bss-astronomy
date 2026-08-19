@@ -306,6 +306,12 @@
       experienceStyles.href = 'experience.css?v=20260720-3';
       document.head.append(experienceStyles);
     }
+    if (!document.querySelector('link[href^="accessibility.css"]')) {
+      const accessibilityStyles = document.createElement('link');
+      accessibilityStyles.rel = 'stylesheet';
+      accessibilityStyles.href = 'accessibility.css?v=20260819-1';
+      document.head.append(accessibilityStyles);
+    }
     import('./space-atmosphere.js?v=20260720-1');
     buildLearningSection();
     buildTopGuide();

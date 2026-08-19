@@ -1,0 +1,4 @@
+.card:focus-visible{border-color:#f5c260;outline:3px solid rgba(245,194,96,.45);outline-offset:3px;transform:translateY(-3px)}
+.card h3{word-break:keep-all;overflow-wrap:break-word;line-break:strict}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(158,199,255,.8);outline-offset:3px}
+@media(max-width:760px){.card{min-height:260px}.card h3{font-size:21px;line-height:1.5}.card .card-stats{font-size:11px;gap:8px}.modal-top h2{word-break:keep-all;line-height:1.35}}

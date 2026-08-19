@@ -2,6 +2,7 @@ const projects = Array.isArray(window.PROJECTS) ? window.PROJECTS : [];
 const $ = selector => document.querySelector(selector);
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 let activeProject = null;
+let lastFocusedElement = null;
 let selectedTopic = '전체';
 let searchText = '';
 let firebase = null;
@@ -75,7 +76,7 @@ function cardMarkup(project) {
   const views = Number(projectStats.get(project.id)?.views || 0).toLocaleString('ko-KR');
   const likes = projectLikes.has(project.id) ? Number(projectLikes.get(project.id) || 0).toLocaleString('ko-KR') : '—';
   const comments = Number(projectComments.get(project.id) || 0).toLocaleString('ko-KR');
-  return `<article class="card" style="--accent:${escapeHtml(project.accent)}" data-id="${escapeHtml(project.id)}"><span class="project-num">STUDENT ${escapeHtml(project.studentId)}</span><span class="tag">${escapeHtml(project.topic)}</span><h3>${escapeHtml(project.title)}</h3><span class="student">학번 ${escapeHtml(project.studentId)}</span><span class="card-stats" aria-label="작품 반응"><span>◉ ${views} 조회</span><span>♥ ${likes} 좋아요</span><span>▣ ${comments} 댓글</span></span><span class="open">VIEW PROJECT →</span></article>`;
+  return `<article class="card" tabindex="0" role="button" aria-label="${escapeHtml(project.title)} 작품 자세히 보기" style="--accent:${escapeHtml(project.accent)}" data-id="${escapeHtml(project.id)}"><span class="project-num">STUDENT ${escapeHtml(project.studentId)}</span><span class="tag">${escapeHtml(project.topic)}</span><h3>${escapeHtml(project.title)}</h3><span class="student">학번 ${escapeHtml(project.studentId)}</span><span class="card-stats" aria-label="작품 반응"><span>◉ ${views} 조회</span><span>♥ ${likes} 좋아요</span><span>▣ ${comments} 댓글</span></span><span class="open">VIEW PROJECT →</span></article>`;
 }
 
 function renderCards() {
@@ -84,7 +85,10 @@ function renderCards() {
   if (!cards) return;
   cards.innerHTML = shown.map(cardMarkup).join('');
   $('#count').textContent = `${shown.length}개 프로젝트`;
-  cards.querySelectorAll('.card').forEach(card => card.addEventListener('click', () => openProject(card.dataset.id)));
+  cards.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => openProject(card.dataset.id));
+    card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openProject(card.dataset.id); } });
+  });
 }
 
 function buildFilters() {
@@ -132,10 +136,12 @@ function openProject(id) {
   const project = projects.find(item => item.id === id);
   if (!project) return;
   activeProject = project;
+  lastFocusedElement = document.activeElement;
   const modal = $('#modal');
   const body = $('#modalBody');
   body.innerHTML = `<div class="modal-top"><span class="tag" style="--accent:${escapeHtml(project.accent)}">${escapeHtml(project.topic)}</span><h2>${escapeHtml(project.title)}</h2><p>2026학년도 2학년 고급지구과학 · 학번 ${escapeHtml(project.studentId)}</p>${project.file ? `<a class="launch" href="${escapeHtml(project.file)}" target="_blank" rel="noopener noreferrer">시뮬레이션 실행 ↗</a>` : ''}</div><div class="modal-grid"><section><h4>개발 동기 및 목적</h4><p>${project.purpose || ''}</p></section><section><h4>과학적 원리 및 수식</h4><p>${project.principle || ''}</p></section><section><h4>시뮬레이션 사용 방법</h4><p>${project.how || ''}</p></section><section><h4>과학적 한계점</h4><p>${project.limit || ''}</p></section></div>${feedbackMarkup()}`;
   modal.showModal();
+  $('#closeBtn')?.focus();
   trackProjectView(project.id);
   window.renderMathInElement?.(body, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }], throwOnError: false });
   $('#projectForm').addEventListener('submit', submitFeedback);
@@ -173,6 +179,7 @@ function closeModal() {
   unsubscribeLikes?.();
   unsubscribeFeedback?.();
   $('#modal')?.close();
+  if (lastFocusedElement && document.contains(lastFocusedElement)) lastFocusedElement.focus();
 }
 
 async function submitFeedback(event) {
@@ -280,6 +287,9 @@ function boot() {
   window.__archiveAppReady = true;
   buildFilters();
   renderCards();
+  $('#search')?.setAttribute('aria-label', '제목, 학번, 조작 변인, 키워드 검색');
+  $('#closeBtn')?.setAttribute('aria-label', '작품 창 닫기');
+  $('#guestbookCloseBtn')?.setAttribute('aria-label', '전체 방명록 닫기');
   $('#search')?.addEventListener('input', event => { searchText = event.target.value; renderCards(); });
   $('#sort')?.addEventListener('change', renderCards);
   $('#randomBtn')?.addEventListener('click', () => { const pool = visibleProjects(); if (pool.length) openProject(pool[Math.floor(Math.random() * pool.length)].id); });
