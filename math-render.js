@@ -231,6 +231,16 @@
     if (input) input.placeholder = '제목, 학번, 조작 변인, 키워드 검색';
   }
 
+  function buildUpdateLink() {
+    const nav = document.querySelector('header nav');
+    if (!nav || nav.querySelector('[data-updates-link]')) return;
+    const link = document.createElement('a');
+    link.href = 'updates.html';
+    link.textContent = '업데이트 기록';
+    link.dataset.updatesLink = 'true';
+    nav.append(link);
+  }
+
   function buildTopGuide() {
     const hero = document.querySelector('.hero');
     const actions = hero?.querySelector('.hero-actions');
@@ -303,6 +313,7 @@
     buildHeroOrbit();
     buildResources();
     tuneArchiveSearch();
+    buildUpdateLink();
     const cards = document.querySelector('#cards');
     if (cards) new MutationObserver(decorateProjectCards).observe(cards, { childList: true });
     decorateProjectCards();
