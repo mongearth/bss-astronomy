@@ -98,6 +98,49 @@ function renderCards() {
     card.addEventListener('click', () => openProject(card.dataset.id));
     card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openProject(card.dataset.id); } });
   });
+  renderInsights();
+}
+
+function ensureInsights() {
+  if ($('#insights')) return;
+  const cards = $('#cards');
+  if (!cards) return;
+  const section = document.createElement('section');
+  section.id = 'insights';
+  section.setAttribute('aria-label', '추천 탐색');
+  cards.before(section);
+}
+
+function loadInsightsStyles() {
+  if (document.querySelector('link[data-insights-style]')) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.dataset.insightsStyle = 'true';
+  link.href = 'insights.css?v=20260819-1';
+  document.head.append(link);
+}
+
+function insightCard(project, value, label) {
+  return `<button class="insight-card" type="button" data-insight-id="${escapeHtml(project.id)}"><span class="insight-kicker">${escapeHtml(label)}</span><strong>${escapeHtml(project.title)}</strong><small>${escapeHtml(project.topic)} · ${value.toLocaleString('ko-KR')}</small></button>`;
+}
+
+function renderInsights() {
+  const root = $('#insights');
+  if (!root) return;
+  const ranked = [...projects];
+  const views = ranked.map(project => ({ project, value: Number(projectStats.get(project.id)?.views || 0) })).sort((a, b) => b.value - a.value).slice(0, 3);
+  const likes = ranked.map(project => ({ project, value: Number(projectLikes.get(project.id) || 0) })).sort((a, b) => b.value - a.value).slice(0, 3);
+  const comments = ranked.map(project => ({ project, value: Number(projectComments.get(project.id) || 0) })).sort((a, b) => b.value - a.value).slice(0, 3);
+  const hasActivity = views.some(item => item.value) || likes.some(item => item.value) || comments.some(item => item.value);
+  const block = (title, items, label) => `<div class="insight-group"><h3>${title}</h3>${hasActivity && items.some(item => item.value) ? items.filter(item => item.value).map(item => insightCard(item.project, item.value, label)).join('') : '<p class="insight-empty">데이터를 모으는 중입니다.</p>'}</div>`;
+  root.innerHTML = `<div class="insights-head"><div><p class="eyebrow">EXPLORE NEXT</p><h2>지금 이어서 탐구해 보세요</h2></div><p>방문자 반응과 주제 연결을 바탕으로 작품을 발견해 보세요.</p></div><div class="insight-grid">${block('많이 본 작품', views, '조회')} ${block('많이 응원받은 작품', likes, '좋아요')} ${block('질문과 댓글이 많은 작품', comments, '댓글')}</div>`;
+  root.querySelectorAll('[data-insight-id]').forEach(button => button.addEventListener('click', () => openProject(button.dataset.insightId)));
+}
+
+function relatedMarkup(project) {
+  const related = projects.filter(item => item.id !== project.id && item.topic === project.topic).slice(0, 3);
+  if (!related.length) return '';
+  return `<section class="related-projects"><h4>함께 탐구할 작품</h4><div>${related.map(item => `<button type="button" data-related-id="${escapeHtml(item.id)}"><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.studentId)} · ${escapeHtml(item.topic)}</small></button>`).join('')}</div></section>`;
 }
 
 function buildFilters() {
@@ -150,13 +193,14 @@ function openProject(id) {
   lastFocusedElement = document.activeElement;
   const modal = $('#modal');
   const body = $('#modalBody');
-  body.innerHTML = `<div class="modal-top"><span class="tag" style="--accent:${escapeHtml(project.accent)}">${escapeHtml(project.topic)}</span><h2>${escapeHtml(project.title)}</h2><p>2026학년도 2학년 고급지구과학 · 학번 ${escapeHtml(project.studentId)}</p>${project.file ? `<a class="launch" href="${escapeHtml(project.file)}" target="_blank" rel="noopener noreferrer">시뮬레이션 실행 ↗</a>` : ''}</div><div class="modal-grid"><section><h4>개발 동기 및 목적</h4><p>${project.purpose || ''}</p></section><section><h4>과학적 원리 및 수식</h4><p>${project.principle || ''}</p></section><section><h4>시뮬레이션 사용 방법</h4><p>${project.how || ''}</p></section><section><h4>과학적 한계점</h4><p>${project.limit || ''}</p></section></div>${feedbackMarkup()}`;
+  body.innerHTML = `<div class="modal-top"><span class="tag" style="--accent:${escapeHtml(project.accent)}">${escapeHtml(project.topic)}</span><h2>${escapeHtml(project.title)}</h2><p>2026학년도 2학년 고급지구과학 · 학번 ${escapeHtml(project.studentId)}</p>${project.file ? `<a class="launch" href="${escapeHtml(project.file)}" target="_blank" rel="noopener noreferrer">시뮬레이션 실행 ↗</a>` : ''}</div><div class="modal-grid"><section><h4>개발 동기 및 목적</h4><p>${project.purpose || ''}</p></section><section><h4>과학적 원리 및 수식</h4><p>${project.principle || ''}</p></section><section><h4>시뮬레이션 사용 방법</h4><p>${project.how || ''}</p></section><section><h4>과학적 한계점</h4><p>${project.limit || ''}</p></section></div>${relatedMarkup(project)}${feedbackMarkup()}`;
   modal.showModal();
   $('#closeBtn')?.focus();
   trackProjectView(project.id);
   window.renderMathInElement?.(body, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }], throwOnError: false });
   $('#projectForm').addEventListener('submit', submitFeedback);
   $('#likeBtn').addEventListener('click', toggleLike);
+  body.querySelectorAll('[data-related-id]').forEach(button => button.addEventListener('click', () => openProject(button.dataset.relatedId)));
   subscribeCommunity();
 }
 
@@ -298,7 +342,9 @@ async function connectFirebase() {
 
 function boot() {
   window.__archiveAppReady = true;
+  loadInsightsStyles();
   buildFilters();
+  ensureInsights();
   renderCards();
   $('#search')?.setAttribute('aria-label', '제목, 학번, 조작 변인, 키워드 검색');
   $('#closeBtn')?.setAttribute('aria-label', '작품 창 닫기');

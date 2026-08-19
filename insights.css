@@ -1,0 +1,37 @@
+#insights {
+  margin: 0 0 36px;
+  padding: 28px;
+  border: 1px solid rgba(112, 132, 190, .45);
+  background: linear-gradient(135deg, rgba(20, 29, 67, .94), rgba(12, 18, 43, .94));
+}
+
+.insights-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; }
+.insights-head h2 { margin: 4px 0 0; color: #f7f4ed; font-size: clamp(24px, 3vw, 34px); letter-spacing: -.03em; }
+.insights-head > p { max-width: 420px; margin: 0; color: #c3ccea; font-size: 15px; line-height: 1.7; }
+.insight-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
+.insight-group { min-width: 0; padding: 17px; border: 1px solid rgba(112, 132, 190, .35); background: rgba(8, 13, 34, .55); }
+.insight-group h3 { margin: 0 0 12px; color: #f4c45b; font-size: 15px; }
+.insight-card { display: block; width: 100%; margin-top: 9px; padding: 12px 13px; border: 1px solid #3d4d82; background: #121a3b; color: #f3f5ff; text-align: left; cursor: pointer; transition: border-color .18s ease, transform .18s ease, background .18s ease; }
+.insight-card:hover, .insight-card:focus-visible { border-color: #f4c45b; background: #1a244d; transform: translateY(-2px); outline: none; }
+.insight-card strong { display: block; font-size: 15px; line-height: 1.45; overflow-wrap: anywhere; }
+.insight-card small { display: block; margin-top: 5px; color: #abb8de; font-size: 12px; }
+.insight-kicker { display: block; margin-bottom: 4px; color: #7ea6ff; font-size: 11px; letter-spacing: .08em; }
+.insight-empty { margin: 0; color: #929fc8; font-size: 13px; line-height: 1.6; }
+
+.related-projects { grid-column: 1 / -1; padding: 22px 45px 4px; border-top: 1px solid rgba(112, 132, 190, .35); }
+.related-projects h4 { margin: 0 0 13px; color: #f4c45b; font-size: 16px; }
+.related-projects > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; }
+.related-projects button { padding: 14px; border: 1px solid #46578f; background: #111733; color: #f1f3ff; text-align: left; cursor: pointer; }
+.related-projects button:hover, .related-projects button:focus-visible { border-color: #f4c45b; outline: none; }
+.related-projects strong, .related-projects small { display: block; }
+.related-projects strong { font-size: 14px; line-height: 1.5; }
+.related-projects small { margin-top: 5px; color: #aeb9df; font-size: 12px; }
+
+@media (max-width: 760px) {
+  #insights { padding: 20px; }
+  .insights-head { display: block; }
+  .insights-head > p { margin-top: 10px; }
+  .insight-grid { grid-template-columns: 1fr; }
+  .related-projects { padding: 20px 25px 25px; }
+  .related-projects > div { grid-template-columns: 1fr; }
+}
