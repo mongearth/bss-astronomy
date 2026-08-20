@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>학생 시뮬레이션 실행 | BSS Astronomy</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="viewer.css?v=20260820-1">
+</head>
+<body class="viewer-page">
+  <header><a class="logo" href="index.html"><span>✦</span> BSS <b>ASTRONOMY</b></a><a class="viewer-back" href="index.html#gallery">아카이브로 돌아가기</a></header>
+  <main class="viewer-main">
+    <p class="eyebrow">ISOLATED SIMULATION</p>
+    <h1 id="viewerTitle">학생 시뮬레이션</h1>
+    <p id="viewerStatus" class="viewer-status">안전한 실행 환경을 준비하고 있습니다.</p>
+    <div id="frameShell" class="frame-shell" hidden><iframe id="simulationFrame" title="학생 천문학 시뮬레이션" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe></div>
+  </main>
+  <script src="projects-data.js?v=20260720-8"></script>
+  <script>
+    (() => {
+      const params = new URLSearchParams(location.search);
+      const requested = params.get('file') || '';
+      const normalized = requested.replace(/\\/g, '/');
+      const project = Array.isArray(window.PROJECTS) ? window.PROJECTS.find(item => item.file === normalized) : null;
+      const status = document.getElementById('viewerStatus');
+      const title = document.getElementById('viewerTitle');
+      const shell = document.getElementById('frameShell');
+      const frame = document.getElementById('simulationFrame');
+      if (!project || !/^simulations\/[a-zA-Z0-9_-]+\.html$/.test(normalized)) {
+        title.textContent = '실행할 작품을 찾을 수 없습니다';
+        status.textContent = '아카이브에서 작품을 다시 선택해 주세요.';
+        return;
+      }
+      title.textContent = project.title || '학생 시뮬레이션';
+      status.textContent = `학번 ${project.studentId} · 제한된 실행 환경에서 열립니다.`;
+      frame.src = normalized;
+      shell.hidden = false;
+    })();
+  </script>
+</body>
+</html>

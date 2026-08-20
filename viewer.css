@@ -1,0 +1,8 @@
+.viewer-page { min-height: 100vh; background: #080b1a; }
+.viewer-back { color: #f5c260; text-decoration: none; font-size: 14px; }
+.viewer-main { padding: 54px max(5vw, 25px) 70px; }
+.viewer-main h1 { max-width: 980px; margin: 0 0 10px; color: #f7f4ed; font-size: clamp(30px, 4vw, 52px); line-height: 1.2; letter-spacing: -.04em; }
+.viewer-status { margin: 0 0 24px; color: #bfc8e8; font-size: 15px; }
+.frame-shell { overflow: hidden; min-height: 70vh; border: 1px solid #46578f; background: #050714; box-shadow: 0 18px 55px rgba(0,0,0,.35); }
+.frame-shell iframe { display: block; width: 100%; height: min(78vh, 900px); border: 0; background: #fff; }
+@media (max-width: 760px) { .viewer-page header { height: 68px; padding: 0 20px; } .viewer-page .logo { font-size: 15px; } .viewer-back { font-size: 12px; } .viewer-main { padding: 34px 18px 45px; } .frame-shell iframe { height: 78vh; } }
