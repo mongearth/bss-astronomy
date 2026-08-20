@@ -12,7 +12,7 @@
   <main class="viewer-main">
     <p class="eyebrow">ISOLATED SIMULATION</p>
     <h1 id="viewerTitle">학생 시뮬레이션</h1>
-    <p id="viewerStatus" class="viewer-status">안전한 실행 환경을 준비하고 있습니다.</p>
+    <p id="viewerStatus" class="viewer-status">시뮬레이션을 불러오고 있습니다.</p>
     <div id="frameShell" class="frame-shell" hidden><iframe id="simulationFrame" title="학생 천문학 시뮬레이션" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe></div>
   </main>
   <script src="projects-data.js?v=20260720-8"></script>
@@ -32,7 +32,7 @@
         return;
       }
       title.textContent = project.title || '학생 시뮬레이션';
-      status.textContent = `학번 ${project.studentId} · 제한된 실행 환경에서 열립니다.`;
+      status.textContent = `학번 ${project.studentId} · 시뮬레이션을 실행합니다.`;
       frame.src = normalized;
       shell.hidden = false;
     })();
